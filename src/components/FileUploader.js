@@ -1,6 +1,8 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 
 const FileUploader = () => {
+    const [isFileUploaded, setIsFileUploaded] = useState(false)
+    const [paths, setPath] = useState([])
     const fileRef = useRef()
 
     const upload = () => {
@@ -11,28 +13,22 @@ const FileUploader = () => {
     const clearInput = () => {
         fileRef.current.value = null
     }
+
     const displayImages = () => {
-        console.log(fileRef.current.files)
-        // for (let file in fileRef.current.files){
-        //     console.log(file)
-        // }
-        // URL.createObjectURL(fileRef.current.files[0])
+        let arr = []
+        for (let key in fileRef.current.files){
+            if (!isNaN(key)) {
+                arr = arr.concat(URL.createObjectURL(fileRef.current.files[key]))
+            }
+        }
+        setIsFileUploaded(true)
+        setPath(arr)
     }
 
     return (
         <div className="flex flex-col">
             <h1 className="flex-1 text-5xl my-10 font-bold">File upload component</h1>
-            <form encType="multipart/form-data">
-            {/* <label>
-            <input 
-                className="w-full mb-10 "
-                type='file' 
-                ref={fileRef} 
-                onChange={displayImages} 
-                accept="image/png, image/gif, image/jpeg"
-                multiple />
-                Attach
-            </label> */}
+            {/* file upload */}
             <div className="flex flex-col items-center justify-center bg-grey-lighter">
                 <label className="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
                     <svg className="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -45,8 +41,20 @@ const FileUploader = () => {
                         className="hidden"
                         accept="image/png, image/gif, image/jpeg"
                         onChange={displayImages} 
+                        multiple
                         />
                 </label>
+                {/* display uploaded pictures */}
+                <div className="w-64 flex-row">
+                    {isFileUploaded 
+                    && 
+                    <div className="w-20 h-20 mt-2">
+                        {
+                            console.log(paths)
+                        }
+                    </div>}
+                </div>
+                {/* buttons */}
                 <div className="my-6">
                     <button
                         className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mr-4 rounded-md'
@@ -58,7 +66,6 @@ const FileUploader = () => {
                         >upload</button>
                 </div>
             </div>
-            </form>
         </div>
     )
 }
