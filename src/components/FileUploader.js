@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import close from './close.svg'
 
 const FileUploader = () => {
@@ -27,8 +27,17 @@ const FileUploader = () => {
         setPath(arr)
     }
 
-    const removeImg = () => {
+    const removeImg = (index) => {
+        // create array from files object
+        let fileBuffer = Array.from(fileRef.current.files);
+        fileBuffer.splice(index, 1);
 
+        const dT = new ClipboardEvent('').clipboardData || // Firefox < 62 workaround exploiting https://bugzilla.mozilla.org/show_bug.cgi?id=1422655
+            new DataTransfer(); // specs compliant (as of March 2018 only Chrome)
+
+        for (let file of fileBuffer) { dT.items.add(file); }
+        fileRef.current.files = dT.files;
+        displayImages()
     }
 
     return (
@@ -36,7 +45,7 @@ const FileUploader = () => {
             <h1 className="flex-1 text-5xl my-10 font-bold">File upload component</h1>
             {/* file upload */}
             <div className="flex flex-col items-center justify-center bg-grey-lighter">
-                <label className="transform duration-100 w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
+                <label className="transform duration-100 w-2/4 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue-500 hover:text-white">
                     <svg className="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
                     </svg>
@@ -51,13 +60,13 @@ const FileUploader = () => {
                         />
                 </label>
                 {/* display uploaded pictures */}
-                <div className="flex justify-start flex-wrap w-64 flex-row my-2 px-1">
+                <div className="flex justify-start flex-wrap w-2/4 flex-row my-2 px-1">
                     {isFileUploaded 
                     && 
                     paths.map((path, i) =>(
                         <div  key={i} className="w-20 h-20 m-px relative">
                             <button 
-                                onClick={removeImg}
+                                onClick={() => removeImg(i)}
                                 className="w-5 h-5 absolute top-1 right-1 focus:outline-none transform hover:scale-125 duration-100">
                                 <img src={close} alt="pic" className="w-full h-full"/>
                             </button>
@@ -74,7 +83,7 @@ const FileUploader = () => {
                     <button
                         className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mr-4 rounded-md focus:outline-none'
                         onClick={clearInput}
-                        >clear</button>
+                        >clear all</button>
                     <button 
                         className="bg-blue-500  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md outline-none focus:outline-none"
                         onClick={upload}
