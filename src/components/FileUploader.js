@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import close from './close.svg'
 
 const FileUploader = () => {
@@ -69,7 +69,7 @@ const FileUploader = () => {
                                 className="w-5 h-5 absolute top-1 right-1 focus:outline-none transform hover:scale-125 duration-100">
                                 <img src={close} alt="pic" className="w-full h-full"/>
                             </button>
-                            <img src={path} className="w-full h-full"/>
+                            <img src={path} className="w-full h-full" alt="file uploaded"/>
                         </div>
                     ))
                 
