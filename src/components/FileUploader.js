@@ -6,39 +6,38 @@ const FileUploader = () => {
     const [paths, setPath] = useState([])
     const fileRef = useRef()
 
-    const upload = () => {
+    const handleUpload = () => {
         alert("data was sent")
-        clearInput()
+        handleClearFiles()
         
     }
-    const clearInput = () => {
+    const handleClearFiles = () => {
         setPath([])
         fileRef.current.value = null
     }
 
-    const displayImages = () => {
-        let arr = []
-        for (let key in fileRef.current.files){
-            if (!isNaN(key)) {
-                arr = arr.concat(URL.createObjectURL(fileRef.current.files[key]))
-            }
-        }
+    const getFilePaths = () => {
+        const fileBuffer = Array.from(fileRef.current.files)
+        const filePaths =  fileBuffer.map(file => URL.createObjectURL(file))
         setIsFileUploaded(true)
-        setPath(arr)
+        setPath(filePaths)
     }
 
-    const removeImg = (index) => {
+    const handleRemoveImg = (index) => {
         // create array from files object
         let fileBuffer = Array.from(fileRef.current.files);
         fileBuffer.splice(index, 1);
 
+        // clipboard items has the same structure as input files
         const dT = new ClipboardEvent('').clipboardData || // Firefox < 62 workaround exploiting https://bugzilla.mozilla.org/show_bug.cgi?id=1422655
             new DataTransfer(); // specs compliant (as of March 2018 only Chrome)
-
+        
+        // we can add files in clipboard items and assign it to input files
         for (let file of fileBuffer) { dT.items.add(file); }
         fileRef.current.files = dT.files;
-        displayImages()
+        getFilePaths()
     }
+
 
     return (
         <div className="flex flex-col">
@@ -55,7 +54,7 @@ const FileUploader = () => {
                         type='file' 
                         className="hidden"
                         accept="image/png, image/gif, image/jpeg"
-                        onChange={displayImages} 
+                        onChange={getFilePaths} 
                         multiple
                         />
                 </label>
@@ -66,12 +65,10 @@ const FileUploader = () => {
                     paths.map((path, i) =>(
                         <div  key={i} className="w-20 h-20 m-px relative">
                             <button 
-                                onClick={() => removeImg(i)}
+                                onClick={() => handleRemoveImg(i)}
                                 className="w-5 h-5 absolute top-1 right-1 focus:outline-none transform hover:scale-125 duration-100">
                                 <img src={close} alt="pic" className="w-full h-full"/>
                             </button>
-
-
                             <img src={path} className="w-full h-full"/>
                         </div>
                     ))
@@ -82,11 +79,11 @@ const FileUploader = () => {
                 <div className="my-6">
                     <button
                         className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mr-4 rounded-md focus:outline-none'
-                        onClick={clearInput}
+                        onClick={handleClearFiles}
                         >clear all</button>
                     <button 
                         className="bg-blue-500  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md outline-none focus:outline-none"
-                        onClick={upload}
+                        onClick={handleUpload}
                         >upload</button>
                 </div>
             </div>
